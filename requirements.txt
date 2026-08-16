@@ -1,0 +1,82 @@
+# ============================================================
+# MediGuide - AI Medical Chatbot
+# Python dependencies
+# ============================================================
+
+
+# ----------------------------
+# Web Framework
+# ----------------------------
+
+# Flask is used to build the backend web application
+# and expose routes/endpoints for the chatbot.
+flask==3.1.1
+
+
+# ----------------------------
+# LangChain Core
+# ----------------------------
+
+# Main LangChain framework used for building the
+# Retrieval-Augmented Generation (RAG) pipeline.
+langchain==0.3.26
+
+# Community integrations such as document loaders,
+# utilities, and other LangChain-supported components.
+langchain-community==0.3.26
+
+
+# ----------------------------
+# LLM Integration
+# ----------------------------
+
+# Connects LangChain with OpenAI models.
+# Used for generating chatbot responses.
+langchain-openai==0.3.24
+
+
+# ----------------------------
+# Vector Database
+# ----------------------------
+
+# LangChain integration for Pinecone.
+# Used to store and retrieve document embeddings.
+langchain-pinecone==0.2.8
+
+
+# ----------------------------
+# Embeddings / NLP
+# ----------------------------
+
+# Provides pretrained sentence embedding models.
+# Used to convert medical text into numerical vectors.
+sentence-transformers==4.1.0
+
+
+# ----------------------------
+# PDF Processing
+# ----------------------------
+
+# Used for reading and extracting text from PDF files,
+# such as medical books or knowledge-base documents.
+pypdf==5.6.1
+
+
+# ----------------------------
+# Environment Variables
+# ----------------------------
+
+# Loads environment variables from a .env file.
+# Useful for securely storing API keys such as
+# OPENAI_API_KEY and PINECONE_API_KEY.
+python-dotenv==1.1.0
+
+
+# ----------------------------
+# Local Project Package
+# ----------------------------
+
+# Installs the current project in editable mode.
+# Changes made to the source code are immediately reflected
+# without reinstalling the package.
+-e .
