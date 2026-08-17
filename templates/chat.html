@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ==========================================================
+         MediGuide
+         AI-Powered Analysis for Intelligent Healthcare Assistance
+         ==========================================================
+
+         Authors:
+         Saurabh Kumbhar - 25204974
+         Azim Hassan     - 25203062
+         ========================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="MediGuide - AI-Powered Analysis for Intelligent Healthcare Assistance"
+    >
+
+    <title>MediGuide | Intelligent Healthcare Assistant</title>
+
+
+    <!-- Google Fonts -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- MediGuide CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ==========================================================
+         Navigation
+         ========================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="#home"
+                class="brand"
+            >
+
+                <div class="brand-logo">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+
+
+                <div class="brand-text">
+
+                    <strong>
+                        MediGuide
+                    </strong>
+
+                    <span>
+                        Intelligent Healthcare AI
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="#about">
+                    About
+                </a>
+
+                <a href="#workflow">
+                    Workflow
+                </a>
+
+                <a href="#architecture">
+                    Architecture
+                </a>
+
+                <a href="#technology">
+                    Technology
+                </a>
+
+
+                <a
+                    href="#assistant"
+                    class="nav-cta"
+                >
+                    <i class="fa-solid fa-comment-medical"></i>
+
+                    Ask MediGuide
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- ==========================================================
+         Hero Section
+         ========================================================== -->
+
+    <section
+        id="home"
+        class="hero-section"
+    >
+
+        <!-- Decorative background elements -->
+
+        <div class="hero-orb hero-orb-one"></div>
+        <div class="hero-orb hero-orb-two"></div>
+
+
+        <div class="page-container hero-container">
+
+
+            <!-- Left Side -->
+
+            <div class="hero-content">
+
+                <div class="eyebrow">
+
+                    <span class="status-dot"></span>
+
+                    AI-Powered Medical Knowledge Assistant
+
+                </div>
+
+
+                <h1>
+
+                    Smarter access to
+
+                    <span>
+                        healthcare knowledge.
+                    </span>
+
+                </h1>
+
+
+                <p class="hero-copy">
+
+                    MediGuide combines medical document retrieval,
+                    semantic search and GPT-4o to provide concise,
+                    context-grounded healthcare information through
+                    an intelligent conversational interface.
+
+                </p>
+
+
+                <div class="hero-actions">
+
+                    <a
+                        href="#assistant"
+                        class="primary-button"
+                    >
+
+                        <i class="fa-solid fa-message"></i>
+
+                        Try MediGuide
+
+                    </a>
+
+
+                    <a
+                        href="#workflow"
+                        class="secondary-button"
+                    >
+
+                        <i class="fa-solid fa-diagram-project"></i>
+
+                        Explore the System
+
+                    </a>
+
+                </div>
+
+
+                <!-- Technology Pills -->
+
+                <div class="hero-tech">
+
+                    <span>
+                        <i class="fa-brands fa-python"></i>
+                        Python
+                    </span>
+
+                    <span>
+                        LangChain
+                    </span>
+
+                    <span>
+                        Pinecone
+                    </span>
+
+                    <span>
+                        GPT-4o
+                    </span>
+
+                    <span>
+                        Flask
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Right Side -->
+
+            <div class="hero-visual">
+
+                <div class="visual-card">
+
+
+                    <div class="visual-card-header">
+
+                        <div>
+
+                            <span class="mini-label">
+                                MEDIGUIDE ENGINE
+                            </span>
+
+                            <h3>
+                                Retrieval Intelligence
+                            </h3>
+
+                        </div>
+
+
+                        <div class="engine-status">
+
+                            <span></span>
+
+                            Active
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Architecture Mini Visual -->
+
+                    <div class="mini-flow">
+
+
+                        <div class="mini-node">
+
+                            <div class="mini-icon">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+
+                            <span>
+                                Question
+                            </span>
+
+                        </div>
+
+
+                        <div class="flow-line"></div>
+
+
+                        <div class="mini-node">
+
+                            <div class="mini-icon">
+                                <i class="fa-solid fa-vector-square"></i>
+                            </div>
+
+                            <span>
+                                Embed
+                            </span>
+
+                        </div>
+
+
+                        <div class="flow-line"></div>
+
+
+                        <div class="mini-node">
+
+                            <div class="mini-icon">
+                                <i class="fa-solid fa-database"></i>
+                            </div>
+
+                            <span>
+                                Retrieve
+                            </span>
+
+                        </div>
+
+
+                        <div class="flow-line"></div>
+
+
+                        <div class="mini-node">
+
+                            <div class="mini-icon">
+                                <i class="fa-solid fa-brain"></i>
+                            </div>
+
+                            <span>
+                                Generate
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Engine Stats -->
+
+                    <div class="engine-stats">
+
+                        <div>
+
+                            <span>
+                                VECTOR INDEX
+                            </span>
+
+                            <strong>
+                                5,859
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                DIMENSIONS
+                            </span>
+
+                            <strong>
+                                384
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                RETRIEVAL
+                            </span>
+
+                            <strong>
+                                Top 3
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Mock Result -->
+
+                    <div class="mock-result">
+
+                        <div class="mock-question">
+
+                            <i class="fa-solid fa-user"></i>
+
+                            What is acne?
+
+                        </div>
+
+
+                        <div class="mock-answer">
+
+                            <div class="mock-ai">
+
+                                <i class="fa-solid fa-heart-pulse"></i>
+
+                            </div>
+
+
+                            <p>
+
+                                Relevant medical context is retrieved
+                                before GPT-4o generates the final response.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         Metrics
+         ========================================================== -->
+
+    <section class="metrics-section">
+
+        <div class="page-container">
+
+            <div class="metrics-grid">
+
+
+                <div class="metric-card">
+
+                    <div class="metric-icon">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            5,859
+                        </strong>
+
+                        <span>
+                            Indexed vectors
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="metric-card">
+
+                    <div class="metric-icon">
+                        <i class="fa-solid fa-vector-square"></i>
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            384
+                        </strong>
+
+                        <span>
+                            Vector dimensions
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="metric-card">
+
+                    <div class="metric-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            Top-K 3
+                        </strong>
+
+                        <span>
+                            Retrieved contexts
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="metric-card">
+
+                    <div class="metric-icon">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            RAG
+                        </strong>
+
+                        <span>
+                            AI architecture
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         About
+         ========================================================== -->
+
+    <section
+        id="about"
+        class="content-section"
+    >
+
+        <div class="page-container">
+
+
+            <div class="section-header">
+
+                <span class="section-kicker">
+                    ABOUT THE PROJECT
+                </span>
+
+
+                <h2>
+                    What is MediGuide?
+                </h2>
+
+
+                <p>
+
+                    MediGuide is a Retrieval-Augmented Generation
+                    application designed to make medical information
+                    easier to explore through natural-language questions.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="about-grid">
+
+
+                <article class="info-card">
+
+                    <div class="card-icon">
+                        <i class="fa-solid fa-book-medical"></i>
+                    </div>
+
+
+                    <h3>
+                        Medical Knowledge Base
+                    </h3>
+
+
+                    <p>
+
+                        Medical PDF content is processed and transformed
+                        into searchable vector representations.
+
+                    </p>
+
+                </article>
+
+
+
+                <article class="info-card">
+
+                    <div class="card-icon">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    </div>
+
+
+                    <h3>
+                        Semantic Retrieval
+                    </h3>
+
+
+                    <p>
+
+                        Questions are compared semantically with medical
+                        text to identify the most relevant information.
+
+                    </p>
+
+                </article>
+
+
+
+                <article class="info-card">
+
+                    <div class="card-icon">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+
+
+                    <h3>
+                        Context-Grounded AI
+                    </h3>
+
+
+                    <p>
+
+                        GPT-4o receives retrieved medical context before
+                        producing a concise answer.
+
+                    </p>
+
+                </article>
+
+
+
+                <article class="info-card">
+
+                    <div class="card-icon">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+
+
+                    <h3>
+                        Natural Interaction
+                    </h3>
+
+
+                    <p>
+
+                        Users can explore medical information through
+                        a simple conversational interface.
+
+                    </p>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         Workflow
+         ========================================================== -->
+
+    <section
+        id="workflow"
+        class="content-section alternate-section"
+    >
+
+        <div class="page-container">
+
+
+            <div class="section-header centered">
+
+                <span class="section-kicker">
+                    SYSTEM WORKFLOW
+                </span>
+
+
+                <h2>
+                    How MediGuide Works
+                </h2>
+
+
+                <p>
+
+                    The complete pipeline transforms raw medical
+                    documents into retrievable knowledge for
+                    context-aware question answering.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="workflow-grid">
+
+
+                <!-- Step 1 -->
+
+                <article class="workflow-card">
+
+                    <span class="workflow-index">
+                        01
+                    </span>
+
+
+                    <div class="workflow-card-icon">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+
+
+                    <h3>
+                        Medical PDF
+                    </h3>
+
+
+                    <p>
+
+                        Medical documents are loaded from the
+                        project knowledge repository.
+
+                    </p>
+
+                </article>
+
+
+
+                <div class="workflow-connector">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+
+
+
+                <!-- Step 2 -->
+
+                <article class="workflow-card">
+
+                    <span class="workflow-index">
+                        02
+                    </span>
+
+
+                    <div class="workflow-card-icon">
+                        <i class="fa-solid fa-scissors"></i>
+                    </div>
+
+
+                    <h3>
+                        Text Chunking
+                    </h3>
+
+
+                    <p>
+
+                        Content is cleaned and divided into
+                        smaller overlapping sections.
+
+                    </p>
+
+                </article>
+
+
+
+                <div class="workflow-connector">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+
+
+
+                <!-- Step 3 -->
+
+                <article class="workflow-card">
+
+                    <span class="workflow-index">
+                        03
+                    </span>
+
+
+                    <div class="workflow-card-icon">
+                        <i class="fa-solid fa-vector-square"></i>
+                    </div>
+
+
+                    <h3>
+                        Embeddings
+                    </h3>
+
+
+                    <p>
+
+                        Sentence Transformers convert each
+                        chunk into a semantic vector.
+
+                    </p>
+
+                </article>
+
+
+
+                <div class="workflow-connector">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+
+
+
+                <!-- Step 4 -->
+
+                <article class="workflow-card">
+
+                    <span class="workflow-index">
+                        04
+                    </span>
+
+
+                    <div class="workflow-card-icon">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+
+
+                    <h3>
+                        Pinecone
+                    </h3>
+
+
+                    <p>
+
+                        Embeddings are indexed for high-speed
+                        semantic similarity search.
+
+                    </p>
+
+                </article>
+
+
+
+                <div class="workflow-connector">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+
+
+
+                <!-- Step 5 -->
+
+                <article class="workflow-card">
+
+                    <span class="workflow-index">
+                        05
+                    </span>
+
+
+                    <div class="workflow-card-icon">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+
+
+                    <h3>
+                        GPT-4o
+                    </h3>
+
+
+                    <p>
+
+                        Retrieved context is combined with the
+                        question to generate the final answer.
+
+                    </p>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         Architecture
+         ========================================================== -->
+
+    <section
+        id="architecture"
+        class="content-section"
+    >
+
+        <div class="page-container">
+
+
+            <div class="architecture-layout">
+
+
+                <div class="architecture-copy">
+
+                    <span class="section-kicker">
+                        RAG ARCHITECTURE
+                    </span>
+
+
+                    <h2>
+                        Retrieval before generation.
+                    </h2>
+
+
+                    <p>
+
+                        MediGuide does not simply send a question directly
+                        to a language model. It first searches the medical
+                        vector database for relevant context.
+
+                    </p>
+
+
+                    <ul class="architecture-list">
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+
+                            Query transformed into an embedding
+                        </li>
+
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+
+                            Pinecone performs cosine similarity search
+                        </li>
+
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+
+                            Top three relevant chunks are retrieved
+                        </li>
+
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+
+                            Retrieved context is added to the system prompt
+                        </li>
+
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+
+                            GPT-4o generates the final response
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+
+                <div class="architecture-diagram">
+
+
+                    <div class="architecture-node">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        <span>
+                            User Query
+                        </span>
+
+                    </div>
+
+
+                    <div class="vertical-arrow">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </div>
+
+
+                    <div class="architecture-node">
+
+                        <i class="fa-solid fa-vector-square"></i>
+
+                        <span>
+                            Query Embedding
+                        </span>
+
+                    </div>
+
+
+                    <div class="vertical-arrow">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </div>
+
+
+                    <div class="architecture-node highlight-node">
+
+                        <i class="fa-solid fa-database"></i>
+
+                        <span>
+                            Pinecone Search
+                        </span>
+
+                    </div>
+
+
+                    <div class="vertical-arrow">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </div>
+
+
+                    <div class="architecture-node">
+
+                        <i class="fa-solid fa-file-lines"></i>
+
+                        <span>
+                            Retrieved Context
+                        </span>
+
+                    </div>
+
+
+                    <div class="vertical-arrow">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </div>
+
+
+                    <div class="architecture-node final-node">
+
+                        <i class="fa-solid fa-brain"></i>
+
+                        <span>
+                            GPT-4o Response
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         Knowledge Base
+         ========================================================== -->
+
+    <section class="content-section alternate-section">
+
+        <div class="page-container">
+
+
+            <div class="section-header centered">
+
+                <span class="section-kicker">
+                    KNOWLEDGE BASE
+                </span>
+
+
+                <h2>
+                    Medical document retrieval
+                </h2>
+
+
+                <p>
+
+                    MediGuide uses semantic vector representations
+                    to make sections of the medical knowledge base
+                    searchable by meaning.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="knowledge-layout">
+
+
+                <div class="knowledge-main-card">
+
+                    <div class="knowledge-icon">
+                        <i class="fa-solid fa-book-open-reader"></i>
+                    </div>
+
+
+                    <div>
+
+                        <span class="mini-label">
+                            KNOWLEDGE SOURCE
+                        </span>
+
+
+                        <h3>
+                            Medical PDF Repository
+                        </h3>
+
+
+                        <p>
+
+                            Medical documents are extracted using
+                            PyPDF, cleaned, chunked and indexed
+                            before the application is started.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="knowledge-specs">
+
+
+                    <div class="spec-item">
+
+                        <span>
+                            Embedding Model
+                        </span>
+
+                        <strong>
+                            all-MiniLM-L6-v2
+                        </strong>
+
+                    </div>
+
+
+                    <div class="spec-item">
+
+                        <span>
+                            Vector Dimension
+                        </span>
+
+                        <strong>
+                            384
+                        </strong>
+
+                    </div>
+
+
+                    <div class="spec-item">
+
+                        <span>
+                            Similarity Metric
+                        </span>
+
+                        <strong>
+                            Cosine
+                        </strong>
+
+                    </div>
+
+
+                    <div class="spec-item">
+
+                        <span>
+                            Retrieval Strategy
+                        </span>
+
+                        <strong>
+                            Top-K = 3
+                        </strong>
+
+                    </div>
+
+
+                    <div class="spec-item">
+
+                        <span>
+                            Vector Store
+                        </span>
+
+                        <strong>
+                            Pinecone
+                        </strong>
+
+                    </div>
+
+
+                    <div class="spec-item">
+
+                        <span>
+                            LLM
+                        </span>
+
+                        <strong>
+                            GPT-4o
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         Technology
+         ========================================================== -->
+
+    <section
+        id="technology"
+        class="content-section"
+    >
+
+        <div class="page-container">
+
+
+            <div class="section-header centered">
+
+                <span class="section-kicker">
+                    TECHNOLOGY STACK
+                </span>
+
+
+                <h2>
+                    Technologies behind MediGuide
+                </h2>
+
+            </div>
+
+
+
+            <div class="technology-grid">
+
+
+                <article class="technology-card">
+
+                    <i class="fa-brands fa-python"></i>
+
+                    <strong>
+                        Python
+                    </strong>
+
+                    <span>
+                        Core application development
+                    </span>
+
+                </article>
+
+
+
+                <article class="technology-card">
+
+                    <i class="fa-solid fa-flask"></i>
+
+                    <strong>
+                        Flask
+                    </strong>
+
+                    <span>
+                        Backend web framework
+                    </span>
+
+                </article>
+
+
+
+                <article class="technology-card">
+
+                    <i class="fa-solid fa-link"></i>
+
+                    <strong>
+                        LangChain
+                    </strong>
+
+                    <span>
+                        RAG pipeline orchestration
+                    </span>
+
+                </article>
+
+
+
+                <article class="technology-card">
+
+                    <i class="fa-solid fa-database"></i>
+
+                    <strong>
+                        Pinecone
+                    </strong>
+
+                    <span>
+                        Vector search database
+                    </span>
+
+                </article>
+
+
+
+                <article class="technology-card">
+
+                    <i class="fa-solid fa-network-wired"></i>
+
+                    <strong>
+                        Sentence Transformers
+                    </strong>
+
+                    <span>
+                        Semantic embeddings
+                    </span>
+
+                </article>
+
+
+
+                <article class="technology-card">
+
+                    <i class="fa-solid fa-brain"></i>
+
+                    <strong>
+                        GPT-4o
+                    </strong>
+
+                    <span>
+                        Language generation
+                    </span>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         Chatbot
+         ========================================================== -->
+
+    <section
+        id="assistant"
+        class="assistant-section"
+    >
+
+        <div class="page-container">
+
+
+            <div class="section-header centered">
+
+                <span class="section-kicker">
+                    LIVE DEMONSTRATION
+                </span>
+
+
+                <h2>
+                    Ask MediGuide
+                </h2>
+
+
+                <p>
+
+                    Enter a healthcare question and MediGuide will
+                    search the indexed medical knowledge base before
+                    generating its response.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="chat-app">
+
+
+                <!-- Chat Header -->
+
+                <div class="chat-header">
+
+
+                    <div class="chat-assistant">
+
+                        <div class="chat-avatar">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                MediGuide
+                            </strong>
+
+                            <span>
+                                <span class="small-online-dot"></span>
+
+                                Medical assistant online
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="clearChat"
+                        class="clear-button"
+                    >
+
+                        <i class="fa-solid fa-trash-can"></i>
+
+                        Clear
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- Messages -->
+
+                <div
+                    id="messages"
+                    class="chat-messages"
+                >
+
+                    <div class="bot-message-row">
+
+
+                        <div class="message-avatar">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+
+
+                        <div class="bot-message">
+
+                            <span class="message-author">
+                                MediGuide
+                            </span>
+
+
+                            <p>
+
+                                Hello! Ask me a question about the
+                                information available in the medical
+                                knowledge base.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Suggested Questions -->
+
+                <div
+                    id="suggestions"
+                    class="suggestions"
+                >
+
+                    <button
+                        type="button"
+                        data-question="What is acne?"
+                    >
+                        What is acne?
+                    </button>
+
+
+                    <button
+                        type="button"
+                        data-question="What is acromegaly and gigantism?"
+                    >
+                        Explain acromegaly
+                    </button>
+
+
+                    <button
+                        type="button"
+                        data-question="What are common approaches to the treatment of acne?"
+                    >
+                        Acne treatment
+                    </button>
+
+                </div>
+
+
+
+                <!-- Typing -->
+
+                <div
+                    id="typing"
+                    class="typing-indicator hidden"
+                >
+
+                    <div class="message-avatar">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+
+
+                    <div class="typing-bubble">
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                    </div>
+
+
+                    <small>
+                        MediGuide is analysing...
+                    </small>
+
+                </div>
+
+
+
+                <!-- Chat Input -->
+
+                <form
+                    id="chatForm"
+                    class="chat-composer"
+                >
+
+                    <textarea
+                        id="chatInput"
+                        name="msg"
+                        rows="1"
+                        maxlength="1000"
+                        placeholder="Ask a healthcare question..."
+                        required
+                    ></textarea>
+
+
+                    <button
+                        id="sendButton"
+                        type="submit"
+                    >
+
+                        <i class="fa-solid fa-arrow-up"></i>
+
+                    </button>
+
+                </form>
+
+
+                <div class="composer-caption">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                    Responses are generated from retrieved
+                    medical context.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         Responsible AI
+         ========================================================== -->
+
+    <section class="safety-section">
+
+        <div class="page-container">
+
+
+            <div class="safety-card">
+
+
+                <div class="safety-icon">
+
+                    <i class="fa-solid fa-shield-heart"></i>
+
+                </div>
+
+
+                <div>
+
+                    <span class="section-kicker">
+                        RESPONSIBLE AI
+                    </span>
+
+
+                    <h2>
+                        Healthcare information, not medical diagnosis.
+                    </h2>
+
+
+                    <p>
+
+                        MediGuide is designed for educational and
+                        informational purposes. It does not replace
+                        professional medical advice, diagnosis,
+                        prescriptions, treatment decisions or
+                        emergency medical services.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         Project Team
+         ========================================================== -->
+
+    <section class="team-section">
+
+        <div class="page-container">
+
+
+            <div class="section-header centered">
+
+                <span class="section-kicker">
+                    PROJECT TEAM
+                </span>
+
+
+                <h2>
+                    Developed by
+                </h2>
+
+            </div>
+
+
+
+            <div class="team-grid">
+
+
+                <article class="developer-card">
+
+
+                    <div class="developer-avatar">
+                        SK
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            Saurabh Kumbhar
+                        </strong>
+
+                        <span>
+                            Student ID: 25204974
+                        </span>
+
+                    </div>
+
+                </article>
+
+
+
+                <article class="developer-card">
+
+
+                    <div class="developer-avatar">
+                        AH
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            Azim Hassan
+                        </strong>
+
+                        <span>
+                            Student ID: 25203062
+                        </span>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         Footer
+         ========================================================== -->
+
+    <footer>
+
+        <div class="page-container footer-content">
+
+
+            <div class="footer-brand">
+
+                <i class="fa-solid fa-heart-pulse"></i>
+
+                <strong>
+                    MediGuide
+                </strong>
+
+            </div>
+
+
+            <p>
+
+                AI-Powered Analysis for Intelligent Healthcare Assistance
+
+            </p>
+
+
+            <span>
+
+                Academic healthcare AI project
+
+            </span>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- ==========================================================
+         JavaScript
+         ========================================================== -->
+
+    <script>
+
+
+        // ----------------------------------------------------------
+        // Elements
+        // ----------------------------------------------------------
+
+        const chatForm =
+            document.getElementById("chatForm");
+
+        const chatInput =
+            document.getElementById("chatInput");
+
+        const messages =
+            document.getElementById("messages");
+
+        const typing =
+            document.getElementById("typing");
+
+        const sendButton =
+            document.getElementById("sendButton");
+
+        const clearButton =
+            document.getElementById("clearChat");
+
+        const suggestions =
+            document.getElementById("suggestions");
+
+
+
+        // ----------------------------------------------------------
+        // Escape HTML
+        // ----------------------------------------------------------
+
+        function escapeHtml(text) {
+
+            const element =
+                document.createElement("div");
+
+            element.textContent =
+                text;
+
+            return element.innerHTML;
+        }
+
+
+
+        // ----------------------------------------------------------
+        // Add User Message
+        // ----------------------------------------------------------
+
+        function addUserMessage(message) {
+
+            const safe =
+                escapeHtml(message);
+
+
+            messages.insertAdjacentHTML(
+
+                "beforeend",
+
+                `
+                <div class="user-message-row">
+
+                    <div class="user-message">
+                        ${safe}
+                    </div>
+
+                    <div class="user-message-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                </div>
+                `
+            );
+
+
+            scrollMessages();
+        }
+
+
+
+        // ----------------------------------------------------------
+        // Add MediGuide Response
+        // ----------------------------------------------------------
+
+        function addBotMessage(message) {
+
+            const safe =
+                escapeHtml(message)
+                    .replace(/\n/g, "<br>");
+
+
+            messages.insertAdjacentHTML(
+
+                "beforeend",
+
+                `
+                <div class="bot-message-row">
+
+                    <div class="message-avatar">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+
+                    <div class="bot-message">
+
+                        <span class="message-author">
+                            MediGuide
+                        </span>
+
+                        <p>
+                            ${safe}
+                        </p>
+
+                    </div>
+
+                </div>
+                `
+            );
+
+
+            scrollMessages();
+        }
+
+
+
+        // ----------------------------------------------------------
+        // Scroll Chat
+        // ----------------------------------------------------------
+
+        function scrollMessages() {
+
+            messages.scrollTo({
+
+                top:
+                    messages.scrollHeight,
+
+                behavior:
+                    "smooth"
+
+            });
+        }
+
+
+
+        // ----------------------------------------------------------
+        // Send Question to Flask
+        // ----------------------------------------------------------
+
+        async function sendQuestion(question) {
+
+            const cleanQuestion =
+                question.trim();
+
+
+            if (!cleanQuestion) {
+
+                return;
+
+            }
+
+
+            addUserMessage(
+                cleanQuestion
+            );
+
+
+            suggestions.style.display =
+                "none";
+
+
+            typing.classList.remove(
+                "hidden"
+            );
+
+
+            sendButton.disabled =
+                true;
+
+
+            const formData =
+                new FormData();
+
+
+            formData.append(
+                "msg",
+                cleanQuestion
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/get",
+                        {
+                            method:
+                                "POST",
+
+                            body:
+                                formData
+                        }
+                    );
+
+
+                const answer =
+                    await response.text();
+
+
+                typing.classList.add(
+                    "hidden"
+                );
+
+
+                addBotMessage(
+                    answer
+                );
+
+            }
+
+
+            catch (error) {
+
+                typing.classList.add(
+                    "hidden"
+                );
+
+
+                addBotMessage(
+
+                    "MediGuide could not connect to the server. Please try again."
+
+                );
+
+            }
+
+
+            finally {
+
+                sendButton.disabled =
+                    false;
+
+
+                chatInput.focus();
+
+            }
+
+        }
+
+
+
+        // ----------------------------------------------------------
+        // Form Submission
+        // ----------------------------------------------------------
+
+        chatForm.addEventListener(
+
+            "submit",
+
+            function (event) {
+
+                event.preventDefault();
+
+
+                const question =
+                    chatInput.value;
+
+
+                chatInput.value =
+                    "";
+
+
+                sendQuestion(
+                    question
+                );
+
+            }
+
+        );
+
+
+
+        // ----------------------------------------------------------
+        // Suggested Questions
+        // ----------------------------------------------------------
+
+        document
+            .querySelectorAll(
+                ".suggestions button"
+            )
+            .forEach(function (button) {
+
+
+                button.addEventListener(
+
+                    "click",
+
+                    function () {
+
+                        sendQuestion(
+                            button.dataset.question
+                        );
+
+                    }
+
+                );
+
+            });
+
+
+
+        // ----------------------------------------------------------
+        // Enter / Shift Enter
+        // ----------------------------------------------------------
+
+        chatInput.addEventListener(
+
+            "keydown",
+
+            function (event) {
+
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    chatForm.requestSubmit();
+
+                }
+
+            }
+
+        );
+
+
+
+        // ----------------------------------------------------------
+        // Auto Resize
+        // ----------------------------------------------------------
+
+        chatInput.addEventListener(
+
+            "input",
+
+            function () {
+
+                this.style.height =
+                    "auto";
+
+
+                this.style.height =
+                    Math.min(
+                        this.scrollHeight,
+                        140
+                    ) + "px";
+
+            }
+
+        );
+
+
+
+        // ----------------------------------------------------------
+        // Clear Conversation
+        // ----------------------------------------------------------
+
+        clearButton.addEventListener(
+
+            "click",
+
+            function () {
+
+
+                messages.innerHTML = `
+
+                    <div class="bot-message-row">
+
+                        <div class="message-avatar">
+
+                            <i class="fa-solid fa-heart-pulse"></i>
+
+                        </div>
+
+
+                        <div class="bot-message">
+
+                            <span class="message-author">
+                                MediGuide
+                            </span>
+
+
+                            <p>
+
+                                Conversation cleared.
+                                What would you like to know?
+
+                            </p>
+
+                        </div>
+
+                    </div>
+                `;
+
+
+                suggestions.style.display =
+                    "flex";
+
+
+                chatInput.focus();
+
+            }
+
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>
