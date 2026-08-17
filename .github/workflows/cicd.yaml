@@ -1,58 +1,232 @@
-name: Deploy Application Docker Image to EC2 instance
+# ============================================================
+# Continuous Deployment
+# ============================================================
+#
+# This job runs after the Continuous Integration job succeeds.
+#
+# Deployment workflow:
+#
+# Amazon ECR
+#     ↓
+# EC2 Self-Hosted GitHub Runner
+#     ↓
+# Pull latest MediGuide Docker image
+#     ↓
+# Stop/remove previous container
+#     ↓
+# Start latest MediGuide container
+#     ↓
+# Verify application health
+#
+# ============================================================
 
-on:
-  push:
-    branches: [main]
+Continuous-Deployment:
+
+  # Run deployment only after CI completes successfully.
+  needs: Continuous-Integration
+
+  # Execute this job directly on the EC2 instance
+  # registered as a GitHub self-hosted runner.
+  runs-on: self-hosted
+
+  steps:
+
+    # --------------------------------------------------------
+    # 1. Checkout Repository
+    # --------------------------------------------------------
+    #
+    # Downloads the latest repository code into the
+    # self-hosted runner workspace.
+    #
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
 
-jobs:
-  Continuous-Integration:
-    runs-on: ubuntu-latest
+    # --------------------------------------------------------
+    # 2. Configure AWS Credentials
+    # --------------------------------------------------------
+    #
+    # Authenticates the GitHub Actions runner with AWS.
+    #
+    # These credentials are stored securely as
+    # GitHub Repository Secrets.
+    #
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+    # --------------------------------------------------------
+    # 3. Login to Amazon ECR
+    # --------------------------------------------------------
+    #
+    # Authenticates Docker with the private Amazon
+    # Elastic Container Registry.
+    #
+    # The generated registry URL is available through:
+    #
+    # steps.login-ecr.outputs.registry
+    #
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPO }}
-          IMAGE_TAG: latest
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .  
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-  Continuous-Deployment:
-    needs: Continuous-Integration
-    runs-on: self-hosted
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    # --------------------------------------------------------
+    # 4. Pull Latest MediGuide Docker Image
+    # --------------------------------------------------------
+    #
+    # Downloads the latest Docker image created by the
+    # Continuous Integration job.
+    #
+    - name: Pull latest MediGuide image
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+      run: |
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        echo "Pulling latest MediGuide Docker image..."
 
-      - name: Run Docker Image to serve users
-        run: |
-         docker run -d -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" -e AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}" -e PINECONE_API_KEY="${{ secrets.PINECONE_API_KEY }}" -e OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" -p 8080:8080 "${{ steps.login-ecr.outputs.registry }}"/"${{ secrets.ECR_REPO }}":latest
+        docker pull \
+          "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
+
+
+    # --------------------------------------------------------
+    # 5. Stop Previous MediGuide Container
+    # --------------------------------------------------------
+    #
+    # First remove the expected named container:
+    #
+    # mediguide-app
+    #
+    # The "|| true" prevents the workflow from failing
+    # if the container does not already exist.
+    #
+    # We also check whether another older/random Docker
+    # container is already using port 8080.
+    #
+    # This handles previous containers such as:
+    #
+    # priceless_montalcini
+    # zen_yalow
+    #
+    - name: Stop previous MediGuide container
+
+      run: |
+
+        echo "Checking for existing MediGuide container..."
+
+        docker stop mediguide-app || true
+        docker rm mediguide-app || true
+
+
+        echo "Checking whether another container is using port 8080..."
+
+        OLD_CONTAINER=$(docker ps -q --filter "publish=8080")
+
+
+        if [ -n "$OLD_CONTAINER" ]; then
+
+          echo "Stopping old container using port 8080..."
+
+          docker stop "$OLD_CONTAINER" || true
+          docker rm "$OLD_CONTAINER" || true
+
+        else
+
+          echo "Port 8080 is available."
+
+        fi
+
+
+    # --------------------------------------------------------
+    # 6. Run Latest MediGuide Container
+    # --------------------------------------------------------
+    #
+    # Starts the newly deployed MediGuide application.
+    #
+    # --name
+    # Gives the container a predictable name instead of
+    # Docker-generated names.
+    #
+    # --restart unless-stopped
+    # Automatically restarts the application after EC2
+    # or Docker restarts.
+    #
+    # -p 8080:8080
+    # Maps EC2 port 8080 to Flask port 8080 inside
+    # the Docker container.
+    #
+    # API keys are passed securely from GitHub Secrets
+    # and are not stored inside the Docker image.
+    #
+    - name: Run MediGuide container
+
+      run: |
+
+        echo "Starting MediGuide container..."
+
+        docker run -d \
+          --name mediguide-app \
+          --restart unless-stopped \
+          -p 8080:8080 \
+          -e OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
+          -e PINECONE_API_KEY="${{ secrets.PINECONE_API_KEY }}" \
+          "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
+
+
+    # --------------------------------------------------------
+    # 7. Verify MediGuide Deployment
+    # --------------------------------------------------------
+    #
+    # Wait briefly for:
+    #
+    # - Flask startup
+    # - Hugging Face model loading
+    # - Pinecone initialization
+    #
+    # Then:
+    #
+    # 1. Display container status
+    # 2. Display application logs
+    # 3. Call the /health endpoint
+    #
+    # If the health endpoint fails, the deployment job
+    # will fail instead of incorrectly reporting success.
+    #
+    - name: Verify MediGuide deployment
+
+      run: |
+
+        echo "Waiting for MediGuide to initialize..."
+
+        sleep 15
+
+
+        echo "========================================="
+        echo "Container Status"
+        echo "========================================="
+
+        docker ps -a
+
+
+        echo ""
+        echo "========================================="
+        echo "MediGuide Application Logs"
+        echo "========================================="
+
+        docker logs mediguide-app
+
+
+        echo ""
+        echo "========================================="
+        echo "Testing MediGuide Health Endpoint"
+        echo "========================================="
+
+        curl --fail http://127.0.0.1:8080/health
+
+
+        echo ""
+        echo "MediGuide deployment completed successfully."
