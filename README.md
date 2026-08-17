@@ -24,86 +24,119 @@
 
 ---
 
-## Overview
+## Table of Contents
+
+- [Overview](#overview)
+- [Research Question and Objective](#research-question-and-objective)
+- [Key Features](#key-features)
+- [System Architecture](#system-architecture)
+- [RAG Pipeline](#rag-pipeline)
+- [Conversational Memory](#conversational-memory)
+- [Knowledge Base Configuration](#knowledge-base-configuration)
+- [Retrieval Evaluation](#retrieval-evaluation)
+- [Technology Stack](#technology-stack)
+- [Project Structure](#project-structure)
+- [How to Run](#how-to-run)
+- [AWS CI/CD Deployment](#aws-cicd-deployment)
+- [Operational Evidence](#operational-evidence)
+- [Testing](#testing)
+- [Security and Responsible AI](#security-and-responsible-ai)
+- [Limitations](#limitations)
+- [Conclusion](#conclusion)
+- [Acknowledgements](#acknowledgements)
+
+---
+
+# Overview
 
 **MediGuide** is an AI-powered healthcare question-answering application built using **Retrieval-Augmented Generation (RAG)**.
 
-The project connects a **637-page medical reference** to a **5,859-vector Pinecone index** and uses semantic retrieval before GPT-4o generates a final answer. The key idea is:
+The system connects a **637-page medical reference** to a **5,859-vector Pinecone index**. For each question, MediGuide retrieves relevant medical evidence before GPT-4o generates a concise response.
 
-> **Retrieve the right evidence first, then let the language model explain it.**
+> **Core idea:** Retrieve the right evidence first, then let the language model explain it.
 
-The complete system includes document ingestion, chunking, embedding generation, Pinecone vector retrieval, history-aware conversational RAG, a Flask web interface, Docker containerisation, Amazon ECR image storage, EC2 deployment and GitHub Actions CI/CD.
+The project demonstrates a complete workflow from document processing and retrieval to web delivery and cloud deployment.
 
-> **Medical disclaimer:** MediGuide is an academic and informational prototype. It is not a diagnosis, prescription, emergency service or replacement for a qualified healthcare professional.
+> **Medical Disclaimer:** MediGuide is an academic and informational prototype. It is not a diagnosis, prescription, emergency service, or substitute for a qualified healthcare professional.
 
 ---
+
+# Research Question and Objective
 
 ## Research Question
 
 > **Can a large medical reference be transformed into fast, focused answers without fine-tuning a model?**
 
-### Objective
+## Objective
 
 Build an end-to-end RAG assistant that:
 
-- retrieves relevant medical context,
-- generates a concise response,
+- retrieves domain-specific medical context,
+- generates concise answers,
 - supports conversational follow-up questions,
-- serves responses through a web application,
-- and is deployable through an automated cloud pipeline.
+- serves responses through a web interface,
+- and can be deployed automatically to AWS.
 
 ---
 
-## Key Features
+# Key Features
 
-- **Retrieval-Augmented Generation** — answers are grounded in retrieved medical context.
-- **Semantic Search** — meaning-based retrieval using dense embeddings.
-- **Pinecone Vector Database** — 5,859 medical vectors stored for fast cosine similarity search.
-- **GPT-4o** — used for query reformulation and final response generation.
-- **Conversational Memory** — recent user/assistant messages are retained.
-- **History-Aware Retrieval** — follow-up questions are rewritten into standalone retrieval queries.
-- **Responsive Flask UI** — custom HTML/CSS/JavaScript frontend.
-- **Dockerised Deployment** — reproducible container environment.
-- **GitHub Actions CI/CD** — automated build and deployment.
-- **AWS Deployment** — Docker image stored in ECR and deployed to EC2.
+- **RAG-based medical question answering**
+- **Semantic search using sentence embeddings**
+- **Pinecone vector retrieval**
+- **GPT-4o response generation**
+- **History-aware follow-up questions**
+- **Temporary conversational memory**
+- **Custom Flask web interface**
+- **Docker containerisation**
+- **Amazon ECR image registry**
+- **Amazon EC2 deployment**
+- **GitHub Actions CI/CD**
+- **EC2 self-hosted GitHub runner**
 
 ---
 
-## System Architecture
+# System Architecture
 
 ```mermaid
 flowchart TD
-    A[User] --> B[Flask Web Interface]
-    B --> C[Conversation History]
-    C --> D[History-Aware Query Reformulation]
-    D --> E[MiniLM Query Embedding]
-    E --> F[(Pinecone Vector Database)]
-    F --> G[Top-3 Relevant Medical Chunks]
-    G --> H[LangChain RAG Prompt]
+    A["User"] --> B["Flask Web Interface"]
+    B --> C["Conversation History"]
+    C --> D["History-Aware Query Reformulation"]
+    D --> E["MiniLM Query Embedding"]
+    E --> F["Pinecone Vector Database"]
+    F --> G["Top-3 Relevant Medical Chunks"]
+    G --> H["LangChain RAG Prompt"]
     C --> H
-    H --> I[GPT-4o]
-    I --> J[Concise Answer]
+    H --> I["GPT-4o"]
+    I --> J["Concise MediGuide Answer"]
     J --> B
 ```
 
 ---
 
-## RAG Pipeline
+# RAG Pipeline
 
-### 1. Load the medical reference
+## 1. Load Medical Reference
 
-The source document is loaded with LangChain PDF loaders.
+The medical PDF is loaded using LangChain PDF loaders.
 
-### 2. Split into chunks
+```text
+Medical PDF
+   ↓
+PyPDFLoader / DirectoryLoader
+   ↓
+LangChain Documents
+```
 
-Current text-splitting configuration:
+## 2. Split into Chunks
 
 | Parameter | Value |
 |---|---:|
 | Chunk size | 500 characters |
 | Chunk overlap | 20 characters |
 
-### 3. Generate embeddings
+## 3. Generate Embeddings
 
 Embedding model:
 
@@ -117,7 +150,7 @@ Embedding dimension:
 384
 ```
 
-### 4. Store in Pinecone
+## 4. Store in Pinecone
 
 Pinecone index:
 
@@ -125,40 +158,44 @@ Pinecone index:
 mediguide
 ```
 
-The index contains **5,859 dense vectors** and uses **cosine similarity**.
+The index contains **5,859 dense vectors** using cosine similarity.
 
-### 5. Retrieve top matches
-
-For every question, MediGuide retrieves:
+## 5. Retrieve Top Matches
 
 ```text
 Top K = 3
 ```
 
-### 6. Generate response
+## 6. Generate Answer
 
 The retrieved context is passed to GPT-4o through LangChain.
 
-A prompt guardrail instructs the model to rely on retrieved context and say that it does not know when evidence is insufficient.
+Prompt behaviour includes:
 
----
-
-## Data-to-Knowledge Flow
-
-```mermaid
-flowchart LR
-    A[637-page Medical PDF] --> B[PyPDFLoader]
-    B --> C[500/20 Character Chunks]
-    C --> D[all-MiniLM-L6-v2]
-    D --> E[384-D Vectors]
-    E --> F[(Pinecone: 5,859 Records)]
+```text
+Use retrieved context.
+If the evidence is insufficient, say that you do not know.
+Keep the answer concise.
 ```
 
 ---
 
-## Conversational Memory
+# Data-to-Knowledge Flow
 
-MediGuide uses LangChain message objects:
+```mermaid
+flowchart LR
+    A["637-page Medical PDF"] --> B["Load"]
+    B --> C["Split: 500 / 20"]
+    C --> D["all-MiniLM-L6-v2"]
+    D --> E["384-D Vectors"]
+    E --> F["Pinecone: 5,859 Records"]
+```
+
+---
+
+# Conversational Memory
+
+MediGuide stores recent conversation messages using:
 
 ```python
 HumanMessage
@@ -174,26 +211,24 @@ MediGuide: Acne is a common skin condition...
 User: How can it be treated?
 ```
 
-Without history, the second question is ambiguous.
-
-With history-aware retrieval, MediGuide interprets it approximately as:
+The second question is ambiguous by itself. The history-aware retriever reformulates it approximately as:
 
 ```text
 How can acne be treated?
 ```
 
-The current application stores the most recent **12 messages**, representing roughly six user-assistant exchanges.
+The current implementation stores the most recent **12 messages**, roughly six user-assistant exchanges.
 
 ---
 
-## Knowledge Base Configuration
+# Knowledge Base Configuration
 
 | Property | Value |
 |---|---|
 | Source | The Gale Encyclopedia of Medicine, 2nd ed. |
 | Source length | 637 pages |
-| Chunk size | 500 |
-| Chunk overlap | 20 |
+| Chunk size | 500 characters |
+| Chunk overlap | 20 characters |
 | Embedding model | `all-MiniLM-L6-v2` |
 | Embedding dimension | 384 |
 | Pinecone index | `mediguide` |
@@ -210,9 +245,9 @@ The current application stores the most recent **12 messages**, representing rou
 
 ---
 
-## Preliminary Retrieval Evaluation
+# Retrieval Evaluation
 
-A small retrieval benchmark was performed using **12 topic-focused prompts** with binary topic-label relevance.
+A preliminary retrieval benchmark used **12 topic-focused prompts** with binary topic-label relevance.
 
 | Metric | Result |
 |---|---:|
@@ -221,20 +256,20 @@ A small retrieval benchmark was performed using **12 topic-focused prompts** wit
 | MRR@3 | **96%** |
 
 <p align="center">
-  <img src="docs/images/retrieval-evaluation.png" alt="Retrieval evaluation metrics" width="70%">
+  <img src="docs/images/retrieval-evaluation.png" alt="Retrieval evaluation graph" width="70%">
 </p>
 
-> **Important:** This evaluates retrieval only. It is not a clinical accuracy evaluation and should not be interpreted as evidence of medical safety or diagnostic performance.
+> This evaluates retrieval performance only. It is not a clinical accuracy or medical safety evaluation.
 
 ---
 
-## Technology Stack
+# Technology Stack
 
 | Layer | Technology |
 |---|---|
 | Language | Python 3.11 |
 | Backend | Flask |
-| RAG orchestration | LangChain |
+| AI orchestration | LangChain |
 | LLM | OpenAI GPT-4o |
 | Embeddings | Sentence Transformers |
 | Embedding model | `all-MiniLM-L6-v2` |
@@ -244,14 +279,14 @@ A small retrieval benchmark was performed using **12 topic-focused prompts** wit
 | Containerisation | Docker |
 | Cloud | AWS |
 | Compute | Amazon EC2 |
-| Registry | Amazon ECR |
+| Container registry | Amazon ECR |
 | CI/CD | GitHub Actions |
 | Deployment runner | GitHub self-hosted runner |
 | Version control | Git / GitHub |
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```text
 projects-saurabh-azim/
@@ -298,59 +333,48 @@ projects-saurabh-azim/
 
 ---
 
-## Important Files
+# How to Run
 
-### `app.py`
-Main backend application responsible for environment loading, Pinecone connection, GPT-4o configuration, history-aware retrieval, RAG execution, chat memory and the `/health` endpoint.
+## Prerequisites
 
-### `src/helper.py`
-Contains reusable functions for PDF loading, metadata filtering, chunking and embedding initialization.
-
-### `src/prompt.py`
-Contains query-reformulation and question-answering prompts plus conversation-history placeholders.
-
-### `store_index.py`
-Builds the vector knowledge base and uploads embeddings to Pinecone.
-
-### `templates/chat.html`
-Defines the interactive MediGuide frontend.
-
-### `static/style.css`
-Contains the responsive interface styling.
-
-### `Dockerfile`
-Defines the application container.
-
-### `.github/workflows/cicd.yaml`
-Builds the Docker image, pushes it to ECR and deploys it to EC2.
-
----
-
-## Local Setup
-
-### Prerequisites
+Before running MediGuide, install:
 
 - Git
 - Conda
 - Python 3.11
-- OpenAI API access
-- Pinecone account
+- pip
 
-### Clone
+You also need:
+
+- an OpenAI API key
+- a Pinecone API key
+
+---
+
+## Step 1 — Clone the Repository
 
 ```bash
 git clone https://github.com/ACM40960/projects-saurabh-azim.git
 cd projects-saurabh-azim
 ```
 
-### Create environment
+---
+
+## Step 2 — Create the Conda Environment
 
 ```bash
 conda create -n mediguide python=3.11 -y
+```
+
+Activate it:
+
+```bash
 conda activate mediguide
 ```
 
-### Install dependencies
+---
+
+## Step 3 — Install Requirements
 
 ```bash
 pip install -r requirements.txt
@@ -358,65 +382,67 @@ pip install -r requirements.txt
 
 ---
 
-## Environment Variables
+## Step 4 — Configure Environment Variables
 
-Create a `.env` file:
+Create a `.env` file in the project root:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key
 PINECONE_API_KEY=your_pinecone_api_key
+OPENAI_API_KEY=your_openai_api_key
 ```
 
-Never commit real secrets.
+> Do not commit the real `.env` file to GitHub.
 
 A safe `.env.example` can contain:
 
 ```env
-OPENAI_API_KEY=
 PINECONE_API_KEY=
+OPENAI_API_KEY=
 ```
 
 ---
 
-## Build the Knowledge Base
+## Step 5 — Build the Pinecone Knowledge Base
+
+Run:
 
 ```bash
 python store_index.py
 ```
 
-Pipeline:
+This performs:
 
 ```text
-Medical PDF
-   ↓
+PDF
+ ↓
 Load
-   ↓
-Clean Metadata
-   ↓
-Split
-   ↓
+ ↓
+Chunk
+ ↓
 Embed
-   ↓
-Upload to Pinecone
+ ↓
+Pinecone
 ```
 
-Only re-index when the knowledge base intentionally changes.
+> Run `store_index.py` only when initially creating or intentionally rebuilding the knowledge base.
 
 ---
 
-## Running the Application
+## Step 6 — Start MediGuide
+
+Run:
 
 ```bash
 python app.py
 ```
 
-Local development URL:
+For local development, open:
 
 ```text
 http://127.0.0.1:8080
 ```
 
-For Docker/EC2, Flask binds to:
+For Docker/EC2 deployment, Flask binds to:
 
 ```text
 0.0.0.0:8080
@@ -424,15 +450,34 @@ For Docker/EC2, Flask binds to:
 
 ---
 
-## Docker Deployment
+## Step 7 — Test the Health Endpoint
 
-Build:
+```bash
+curl http://127.0.0.1:8080/health
+```
+
+Example response:
+
+```json
+{
+  "application": "MediGuide",
+  "status": "healthy",
+  "model": "gpt-4o",
+  "index": "mediguide"
+}
+```
+
+---
+
+# Docker
+
+## Build the Image
 
 ```bash
 docker build -t mediguide .
 ```
 
-Run:
+## Run the Container
 
 ```bash
 docker run -d \
@@ -442,13 +487,13 @@ docker run -d \
   mediguide
 ```
 
-Status:
+## Check Status
 
 ```bash
 docker ps
 ```
 
-Logs:
+## View Logs
 
 ```bash
 docker logs mediguide-app
@@ -456,108 +501,272 @@ docker logs mediguide-app
 
 ---
 
-## AWS Deployment
+# AWS CI/CD Deployment
+
+MediGuide uses the following deployment architecture:
 
 ```mermaid
 flowchart LR
-    A[Push to main] --> B[GitHub Actions CI]
-    B --> C[Docker Build]
-    C --> D[(Amazon ECR)]
-    D --> E[GitHub Actions CD]
-    E --> F[EC2 Self-Hosted Runner]
-    F --> G[Pull Latest Image]
-    G --> H[mediguide-app]
-    H --> I[/health]
+    A["Push to main"] --> B["GitHub Actions CI"]
+    B --> C["Docker Build"]
+    C --> D["Amazon ECR"]
+    D --> E["GitHub Actions CD"]
+    E --> F["EC2 Self-Hosted Runner"]
+    F --> G["Pull Latest Image"]
+    G --> H["mediguide-app"]
+    H --> I["Health Check: /health"]
 ```
 
-### Continuous Integration
+This fixes the Mermaid rendering issue caused by using `/health` directly as an unquoted node label.
 
-Runs on:
+---
+
+## Step 1 — AWS Account
+
+Log in to the AWS console.
+
+---
+
+## Step 2 — Create IAM Deployment Credentials
+
+The CI/CD workflow needs permission to work with Amazon ECR.
+
+For the academic deployment, the project uses AWS credentials stored securely in GitHub Actions Secrets.
+
+Typical permissions used during setup include access to:
+
+- Amazon ECR
+- Amazon EC2
+
+Never place AWS access keys directly inside source code or workflow files.
+
+---
+
+## Step 3 — Create an Amazon ECR Repository
+
+Create an ECR repository named:
 
 ```text
-ubuntu-latest
+mediguide
 ```
 
-Steps:
+The CI workflow builds the application Docker image and pushes:
 
 ```text
-Checkout
-  ↓
-Configure AWS Credentials
-  ↓
-Login to ECR
-  ↓
-Build Docker Image
-  ↓
-Push Image to ECR
+mediguide:latest
 ```
 
-### Continuous Deployment
+to ECR.
 
-Runs on:
+---
+
+## Step 4 — Create an EC2 Instance
+
+Create an Ubuntu EC2 instance.
+
+The deployed application runs inside a Docker container on the instance.
+
+The EC2 Security Group should allow the ports required for your deployment, including port `8080` when accessing Flask directly.
+
+---
+
+## Step 5 — Install Docker on EC2
+
+Connect to EC2 and run:
+
+```bash
+sudo apt-get update -y
+```
+
+Install Docker:
+
+```bash
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
+
+Allow the Ubuntu user to run Docker:
+
+```bash
+sudo usermod -aG docker ubuntu
+newgrp docker
+```
+
+Verify:
+
+```bash
+docker --version
+```
+
+---
+
+## Step 6 — Configure EC2 as a GitHub Self-Hosted Runner
+
+In GitHub:
 
 ```text
+Repository
+  → Settings
+  → Actions
+  → Runners
+  → New self-hosted runner
+```
+
+Choose:
+
+```text
+Linux
+x64
+```
+
+Then execute the GitHub-provided registration commands on EC2.
+
+After registration, install the runner as a service:
+
+```bash
+cd ~/actions-runner
+sudo ./svc.sh install
+sudo ./svc.sh start
+sudo ./svc.sh status
+```
+
+The runner should appear in GitHub as:
+
+```text
+Idle
+Linux
+X64
 self-hosted
 ```
 
-Steps:
+---
+
+## Step 7 — Configure GitHub Actions Secrets
+
+Go to:
 
 ```text
-Checkout
-  ↓
-Configure AWS Credentials
-  ↓
-Login to ECR
-  ↓
-Pull Latest Image
-  ↓
-Stop/Remove Old Container
-  ↓
-Run mediguide-app
-  ↓
-Verify /health
+Repository
+  → Settings
+  → Secrets and variables
+  → Actions
 ```
 
-### GitHub Secrets
+Add:
 
 ```text
 AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
 AWS_DEFAULT_REGION
 ECR_REPO
-OPENAI_API_KEY
 PINECONE_API_KEY
+OPENAI_API_KEY
 ```
 
 ---
 
-## Operational Evidence
+## Continuous Integration
 
-### MediGuide Interface
+The CI job runs on:
+
+```text
+ubuntu-latest
+```
+
+It performs:
+
+```text
+Checkout
+   ↓
+Configure AWS Credentials
+   ↓
+Login to Amazon ECR
+   ↓
+Build Docker Image
+   ↓
+Push Image to ECR
+```
+
+---
+
+## Continuous Deployment
+
+The CD job runs on:
+
+```text
+self-hosted
+```
+
+It performs:
+
+```text
+Login to ECR
+   ↓
+Pull Latest Image
+   ↓
+Stop Old Container
+   ↓
+Remove Old Container
+   ↓
+Run mediguide-app
+   ↓
+Health Check
+```
+
+The deployment uses a fixed container name:
+
+```text
+mediguide-app
+```
+
+to avoid Docker-generated names such as random adjective/name combinations.
+
+---
+
+## Triggering Deployment
+
+The workflow is triggered whenever code is pushed to:
+
+```text
+main
+```
+
+If a redeployment is required without changing files:
+
+```bash
+git commit --allow-empty -m "Redeploy MediGuide application"
+git push origin main
+```
+
+---
+
+# Operational Evidence
+
+## MediGuide Interface
 
 <p align="center">
   <img src="docs/images/mediguide-home.png" alt="MediGuide live interface" width="100%">
 </p>
 
-### Pinecone Project Overview
+## Pinecone Project Overview
 
 <p align="center">
   <img src="docs/images/pinecone-overview.png" alt="Pinecone project overview" width="92%">
 </p>
 
-### Pinecone Index
+## Pinecone Index
 
 <p align="center">
-  <img src="docs/images/pinecone-index.png" alt="Pinecone index configuration" width="92%">
+  <img src="docs/images/pinecone-index.png" alt="Pinecone index" width="92%">
 </p>
 
-### Pinecone Metrics
+## Pinecone Metrics
 
 <p align="center">
   <img src="docs/images/pinecone-metrics.png" alt="Pinecone metrics" width="92%">
 </p>
 
-### Storage and Record Count
+## Storage and Record Count
 
 <p align="center">
   <img src="docs/images/pinecone-storage-records.png" alt="Pinecone storage and record count" width="92%">
@@ -565,21 +774,40 @@ PINECONE_API_KEY
 
 ---
 
-## Testing
+# Testing
 
-### Health check
+## Local Test
+
+```bash
+python app.py
+```
+
+## Docker Test
+
+```bash
+docker build -t mediguide:test .
+```
+
+```bash
+docker run --rm \
+  -p 8080:8080 \
+  --env-file .env \
+  mediguide:test
+```
+
+## Health Check
 
 ```bash
 curl http://127.0.0.1:8080/health
 ```
 
-### Container status
+## Container Inspection
 
 ```bash
 docker ps -a
 ```
 
-### Container logs
+## Container Logs
 
 ```bash
 docker logs mediguide-app
@@ -587,76 +815,71 @@ docker logs mediguide-app
 
 ---
 
-## Security and Responsible AI
+# Security and Responsible AI
 
-MediGuide follows several implementation practices:
+The project applies the following practices:
 
-- API keys are loaded through environment variables.
 - `.env` is excluded from version control.
+- API keys are loaded through environment variables.
 - deployment credentials are stored in GitHub Secrets.
 - Docker images do not contain the local `.env`.
 - the repository is private.
-- the self-hosted runner is scoped to the project.
-- retrieved context is used as the main evidence source.
-- the prototype is explicitly positioned as educational support only.
+- AWS credentials are not hard-coded.
+- retrieved context is used as the primary evidence source.
+- the system is clearly presented as an educational prototype.
 
-Users should **not enter identifying or sensitive personal medical information** into the prototype.
-
----
-
-## Limitations
-
-### Outdated source material
-The indexed medical source is from 2002 and may not reflect current clinical guidance.
-
-### Retrieval evaluation is not clinical evaluation
-The 12-question benchmark evaluates retrieval relevance only.
-
-### No evidence citations in answers
-The current interface does not display page-level source citations or confidence.
-
-### Temporary memory
-Conversation history is stored in memory and is lost when the application restarts.
-
-### Multi-user isolation
-The current memory approach is primarily suitable for demonstration; production deployment needs per-user session memory.
-
-### Logging
-The current implementation may print user queries to application logs.
-
-### External dependencies
-The application depends on OpenAI and Pinecone availability, credentials and quotas.
+Users should not submit identifying or sensitive medical information.
 
 ---
 
-## Conclusion
+# Limitations
 
-MediGuide demonstrates a complete route from a large medical reference document to a usable, cloud-deployed AI information assistant.
+- The medical reference is from **2002** and may not reflect current clinical guidance.
+- The current benchmark evaluates retrieval only, not clinical accuracy.
+- Responses do not yet display page-level evidence citations.
+- Conversation memory is temporary and is lost on server restart.
+- The current memory implementation is primarily suitable for a demonstration rather than a multi-user production system.
+- The application depends on external OpenAI and Pinecone services.
+- Production deployment would require stronger privacy, monitoring, safety and clinical validation.
 
-The prototype integrates:
+---
 
-- PDF ingestion,
-- chunking,
-- sentence embeddings,
-- Pinecone retrieval,
-- RAG,
-- conversational memory,
+# Conclusion
+
+MediGuide demonstrates a complete end-to-end RAG application for medical information retrieval.
+
+The system integrates:
+
+- a 637-page medical reference,
+- 5,859 Pinecone vectors,
+- 384-dimensional sentence embeddings,
+- Top-3 semantic retrieval,
 - GPT-4o,
+- history-aware conversational RAG,
 - Flask,
 - Docker,
 - Amazon ECR,
 - Amazon EC2,
-- GitHub Actions CI/CD.
+- and GitHub Actions CI/CD.
 
-The system shows the practical value of RAG for domain-grounded question answering. Real clinical use would require **current evidence, clinician-reviewed evaluation, stronger safety controls, privacy protections and production-grade infrastructure**.
+The prototype shows how retrieval can narrow a large medical corpus to relevant evidence before an LLM converts that evidence into a readable response.
 
 ---
 
-## Acknowledgements
+# Acknowledgements
 
 This project was developed as part of the **MSc Data & Computational Science programme at University College Dublin**.
 
-The implementation was inspired by existing medical RAG examples and extended with MediGuide-specific interface design, conversational retrieval, memory, Pinecone configuration, retrieval evaluation, Docker packaging, AWS infrastructure and automated CI/CD.
+The implementation was inspired by existing medical RAG examples and extended with project-specific:
+
+- MediGuide interface design,
+- conversational memory,
+- history-aware retrieval,
+- Pinecone configuration,
+- retrieval evaluation,
+- Docker packaging,
+- AWS deployment,
+- and automated CI/CD.
 
 ---
 
