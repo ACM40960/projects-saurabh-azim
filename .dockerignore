@@ -1,22 +1,44 @@
+# ============================================================
+# MediGuide - Docker Ignore
+# ============================================================
+
+
+# Git
 .git
+.gitignore
 .github
 
+
+# Environment secrets
 .env
 
+
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-.venv/
-venv/
 
+# Virtual environments
+venv/
+.venv/
+env/
+
+
+# IDE configuration
 .vscode/
 .idea/
 
+
+# Python package metadata
 mediguide.egg-info/
 
+
+# Development notebook
 research/
 
+
+# Operating system files
 .DS_Store
 Thumbs.db

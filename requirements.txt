@@ -1,82 +1,72 @@
 # ============================================================
 # MediGuide - AI Medical Chatbot
-# Python dependencies
+# Python Dependencies
 # ============================================================
 
 
-# ----------------------------
+# ------------------------------------------------------------
 # Web Framework
-# ----------------------------
+# ------------------------------------------------------------
 
-# Flask is used to build the backend web application
-# and expose routes/endpoints for the chatbot.
+# Flask provides the backend web server and application routes.
 flask==3.1.1
 
 
-# ----------------------------
+# ------------------------------------------------------------
 # LangChain Core
-# ----------------------------
+# ------------------------------------------------------------
 
-# Main LangChain framework used for building the
-# Retrieval-Augmented Generation (RAG) pipeline.
+# Core framework used to build the Retrieval-Augmented
+# Generation (RAG) pipeline.
 langchain==0.3.26
 
-# Community integrations such as document loaders,
-# utilities, and other LangChain-supported components.
+# Community integrations including document loaders
+# and supporting utilities.
 langchain-community==0.3.26
 
 
-# ----------------------------
-# LLM Integration
-# ----------------------------
+# ------------------------------------------------------------
+# OpenAI Integration
+# ------------------------------------------------------------
 
-# Connects LangChain with OpenAI models.
-# Used for generating chatbot responses.
+# LangChain integration for OpenAI models such as GPT-4o.
 langchain-openai==0.3.24
 
 
-# ----------------------------
-# Vector Database
-# ----------------------------
+# ------------------------------------------------------------
+# Pinecone Vector Database
+# ------------------------------------------------------------
 
-# LangChain integration for Pinecone.
-# Used to store and retrieve document embeddings.
+# Connects LangChain with the Pinecone vector database.
 langchain-pinecone==0.2.8
 
 
-# ----------------------------
-# Embeddings / NLP
-# ----------------------------
+# ------------------------------------------------------------
+# Hugging Face Embeddings
+# ------------------------------------------------------------
 
-# Provides pretrained sentence embedding models.
-# Used to convert medical text into numerical vectors.
+# Provides local sentence embedding models.
 sentence-transformers==4.1.0
 
+# Dedicated LangChain Hugging Face integration.
+# Use this if helper.py imports:
+#
+# from langchain_huggingface import HuggingFaceEmbeddings
+#
+langchain-huggingface==0.3.1
 
-# ----------------------------
+
+# ------------------------------------------------------------
 # PDF Processing
-# ----------------------------
+# ------------------------------------------------------------
 
-# Used for reading and extracting text from PDF files,
-# such as medical books or knowledge-base documents.
+# Used to read and extract text from medical PDF documents.
 pypdf==5.6.1
 
 
-# ----------------------------
+# ------------------------------------------------------------
 # Environment Variables
-# ----------------------------
+# ------------------------------------------------------------
 
-# Loads environment variables from a .env file.
-# Useful for securely storing API keys such as
-# OPENAI_API_KEY and PINECONE_API_KEY.
+# Loads API keys and configuration from environment variables.
 python-dotenv==1.1.0
-
-
-# ----------------------------
-# Local Project Package
-# ----------------------------
-
-# Installs the current project in editable mode.
-# Changes made to the source code are immediately reflected
-# without reinstalling the package.
--e .
