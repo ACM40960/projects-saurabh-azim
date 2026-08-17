@@ -3,17 +3,15 @@
 # AI-Powered Analysis for Intelligent Healthcare Assistance
 # ============================================================
 #
-# This file is the main backend application for MediGuide.
-#
 # Main responsibilities:
 # 1. Load environment variables
-# 2. Initialize Hugging Face embeddings
-# 3. Connect to the existing Pinecone vector index
-# 4. Configure document retrieval
-# 5. Configure the GPT-4o language model
-# 6. Build the Retrieval-Augmented Generation (RAG) pipeline
-# 7. Serve the MediGuide chat interface
-# 8. Process user questions through the /get endpoint
+# 2. Connect to Pinecone
+# 3. Configure Hugging Face embeddings
+# 4. Configure GPT-4o
+# 5. Create history-aware retrieval
+# 6. Maintain conversation memory
+# 7. Process medical questions
+# 8. Clear conversation history
 #
 # Authors:
 # Saurabh Kumbhar - 25204974
@@ -21,50 +19,38 @@
 # ============================================================
 
 
-# ----------------------------
-# Standard Library Imports
-# ----------------------------
-
 import os
 
-
-# ----------------------------
-# Flask Imports
-# ----------------------------
-
 from flask import Flask, render_template, request
-
-
-# ----------------------------
-# Environment Configuration
-# ----------------------------
-
 from dotenv import load_dotenv
-
-
-# ----------------------------
-# LangChain Imports
-# ----------------------------
 
 from langchain_openai import ChatOpenAI
 from langchain_pinecone import PineconeVectorStore
-from langchain.chains import create_retrieval_chain
+
+from langchain.chains import (
+    create_history_aware_retriever,
+    create_retrieval_chain,
+)
+
 from langchain.chains.combine_documents import (
     create_stuff_documents_chain,
 )
-from langchain_core.prompts import ChatPromptTemplate
 
-
-# ----------------------------
-# MediGuide Project Imports
-# ----------------------------
+from langchain_core.messages import (
+    HumanMessage,
+    AIMessage,
+)
 
 from src.helper import download_hugging_face_embeddings
-from src.prompt import system_prompt
+
+from src.prompt import (
+    contextualize_q_prompt,
+    qa_prompt,
+)
 
 
 # ============================================================
-# 1. Initialize Flask Application
+# 1. Initialize Flask
 # ============================================================
 
 app = Flask(__name__)
@@ -74,57 +60,43 @@ app = Flask(__name__)
 # 2. Load Environment Variables
 # ============================================================
 
-# Load API keys from the .env file.
 load_dotenv()
 
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv(
+    "OPENAI_API_KEY"
+)
+
+PINECONE_API_KEY = os.getenv(
+    "PINECONE_API_KEY"
+)
 
 
-# Validate Pinecone API key.
-if not PINECONE_API_KEY:
-    raise ValueError(
-        "PINECONE_API_KEY is missing. "
-        "Please add it to the .env file."
-    )
-
-
-# Validate OpenAI API key.
 if not OPENAI_API_KEY:
     raise ValueError(
-        "OPENAI_API_KEY is missing. "
-        "Please add it to the .env file."
+        "OPENAI_API_KEY is missing from the .env file."
+    )
+
+
+if not PINECONE_API_KEY:
+    raise ValueError(
+        "PINECONE_API_KEY is missing from the .env file."
     )
 
 
 # ============================================================
-# 3. Load Hugging Face Embeddings
+# 3. Load Embeddings
 # ============================================================
 
-# Load the same embedding model that was used when
-# the medical knowledge base was indexed in Pinecone.
-#
-# Model:
-# sentence-transformers/all-MiniLM-L6-v2
-#
-# Vector dimension:
-# 384
 embeddings = download_hugging_face_embeddings()
 
 
 # ============================================================
-# 4. Connect to Existing Pinecone Index
+# 4. Connect to Pinecone
 # ============================================================
 
-# IMPORTANT:
-# The index name must exactly match the index
-# created in your Pinecone indexing script.
 INDEX_NAME = "mediguide"
 
 
-# Connect to the existing Pinecone vector store.
-#
-# This does not upload the PDF documents again.
 docsearch = PineconeVectorStore.from_existing_index(
     index_name=INDEX_NAME,
     embedding=embeddings,
@@ -132,11 +104,9 @@ docsearch = PineconeVectorStore.from_existing_index(
 
 
 # ============================================================
-# 5. Configure Medical Document Retriever
+# 5. Configure Retriever
 # ============================================================
 
-# Retrieve the top 3 most relevant medical text chunks
-# for every user question.
 retriever = docsearch.as_retriever(
     search_type="similarity",
     search_kwargs={
@@ -149,12 +119,6 @@ retriever = docsearch.as_retriever(
 # 6. Configure GPT-4o
 # ============================================================
 
-# GPT-4o generates the final response using the
-# medical context retrieved from Pinecone.
-#
-# temperature=0:
-# Keeps responses focused and consistent for
-# question-answering tasks.
 chat_model = ChatOpenAI(
     model="gpt-4o",
     temperature=0,
@@ -163,109 +127,96 @@ chat_model = ChatOpenAI(
 
 
 # ============================================================
-# 7. Configure MediGuide Prompt
+# 7. Create History-Aware Retriever
 # ============================================================
 
-# The system prompt is stored in:
+# This makes retrieval aware of the previous conversation.
 #
-# src/prompt.py
+# Example:
 #
-# LangChain automatically inserts retrieved document
-# content into the {context} placeholder.
-prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            system_prompt,
-        ),
-        (
-            "human",
-            "{input}",
-        ),
-    ]
+# What is acne?
+# How can it be treated?
+#
+# becomes:
+#
+# How can acne be treated?
+
+history_aware_retriever = create_history_aware_retriever(
+    chat_model,
+    retriever,
+    contextualize_q_prompt,
 )
 
 
 # ============================================================
-# 8. Build Question-Answering Chain
+# 8. Create Question-Answering Chain
 # ============================================================
 
-# Combine:
-#
-# Retrieved medical documents
-#        +
-# MediGuide system prompt
-#        +
-# User question
-#        ↓
-# GPT-4o
-#
 question_answer_chain = create_stuff_documents_chain(
     chat_model,
-    prompt,
+    qa_prompt,
 )
 
 
 # ============================================================
-# 9. Build Complete RAG Pipeline
+# 9. Create Conversational RAG Chain
 # ============================================================
 
-# Complete MediGuide workflow:
-#
-# User Question
-#       ↓
-# Hugging Face Query Embedding
-#       ↓
-# Pinecone Similarity Search
-#       ↓
-# Top 3 Relevant Medical Chunks
-#       ↓
-# MediGuide System Prompt
-#       ↓
-# GPT-4o
-#       ↓
-# Final Response
-#
 rag_chain = create_retrieval_chain(
-    retriever,
+    history_aware_retriever,
     question_answer_chain,
 )
 
 
 # ============================================================
-# 10. Home Route
+# 10. Conversation Memory
+# ============================================================
+
+# Stores the current conversation while Flask is running.
+#
+# Example:
+#
+# HumanMessage("What is acne?")
+# AIMessage("Acne is...")
+# HumanMessage("How can it be treated?")
+#
+chat_history = []
+
+
+# ============================================================
+# 11. Home Route
 # ============================================================
 
 @app.route("/")
-def index():
-    """
-    Render the main MediGuide chatbot interface.
-    """
+def home():
 
-    return render_template("chat.html")
+    return render_template(
+        "chat.html"
+    )
 
 
 # ============================================================
-# 11. Chat Route
+# 12. Chat Route
 # ============================================================
 
-@app.route("/get", methods=["POST"])
-def chat():
-    """
-    Receive the user's healthcare question,
-    process it through the RAG pipeline,
-    and return the generated response.
-    """
+@app.route(
+    "/get",
+    methods=["POST"]
+)
+def get_response():
 
-    # Retrieve the message sent from the frontend.
+    global chat_history
+
+
+    # Get user question.
     user_message = request.form.get(
         "msg",
         "",
     ).strip()
 
 
-    # Prevent empty questions.
     if not user_message:
+
         return (
             "Please enter a valid healthcare question.",
             400,
@@ -274,29 +225,22 @@ def chat():
 
     try:
 
-        # ----------------------------------------------------
-        # Log User Question
-        # ----------------------------------------------------
-
         print(
-            f"\n[MediGuide] User Question: {user_message}"
+            f"\n[MediGuide] User: {user_message}"
         )
 
 
         # ----------------------------------------------------
-        # Run RAG Pipeline
+        # Run Conversational RAG
         # ----------------------------------------------------
 
         response = rag_chain.invoke(
             {
                 "input": user_message,
+                "chat_history": chat_history,
             }
         )
 
-
-        # ----------------------------------------------------
-        # Extract Generated Answer
-        # ----------------------------------------------------
 
         answer = response.get(
             "answer",
@@ -304,38 +248,113 @@ def chat():
         )
 
 
-        # Log the generated response.
-        print(
-            f"[MediGuide] Response: {answer}\n"
+        # ----------------------------------------------------
+        # Save Question and Answer to Memory
+        # ----------------------------------------------------
+
+        chat_history.append(
+            HumanMessage(
+                content=user_message
+            )
         )
 
 
-        # Return the answer to the web interface.
+        chat_history.append(
+            AIMessage(
+                content=answer
+            )
+        )
+
+
+        # ----------------------------------------------------
+        # Limit Conversation Memory
+        # ----------------------------------------------------
+
+        # Keep the most recent 12 messages.
+        #
+        # Approximately:
+        # 6 user questions
+        # +
+        # 6 MediGuide answers
+
+        if len(chat_history) > 12:
+
+            chat_history = chat_history[-12:]
+
+
+        print(
+            f"[MediGuide] Assistant: {answer}"
+        )
+
+
+        print(
+            f"[MediGuide] Memory size: "
+            f"{len(chat_history)} messages\n"
+        )
+
+
         return str(answer)
 
 
     except Exception as error:
 
-        # ----------------------------------------------------
-        # Development Error Logging
-        # ----------------------------------------------------
-
         print(
-            f"\n[MediGuide] Error: {error}\n"
+            f"[MediGuide] Error: {error}"
         )
 
 
-        # Return a clean message to the user instead
-        # of exposing the Python traceback.
         return (
-            "MediGuide is currently unable to process "
-            "your request. Please try again shortly.",
+            "Sorry, MediGuide is currently unable to "
+            "process your question. Please try again.",
             500,
         )
 
 
 # ============================================================
-# 12. Run MediGuide Locally
+# 13. Clear Conversation Memory
+# ============================================================
+
+@app.route(
+    "/clear",
+    methods=["POST"]
+)
+def clear_conversation():
+
+    global chat_history
+
+
+    chat_history = []
+
+
+    print(
+        "[MediGuide] Conversation memory cleared."
+    )
+
+
+    return (
+        "Conversation cleared.",
+        200,
+    )
+
+
+# ============================================================
+# 14. Health Check
+# ============================================================
+
+@app.route("/health")
+def health():
+
+    return {
+        "application": "MediGuide",
+        "status": "healthy",
+        "model": "gpt-4o",
+        "index": INDEX_NAME,
+        "memory_messages": len(chat_history),
+    }
+
+
+# ============================================================
+# 15. Run Flask
 # ============================================================
 
 if __name__ == "__main__":
@@ -345,4 +364,3 @@ if __name__ == "__main__":
         port=8080,
         debug=True,
     )
-

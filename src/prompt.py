@@ -1,16 +1,12 @@
 # ============================================================
-# MediGuide - System Prompt
+# MediGuide - Prompt Configuration
 # AI-Powered Analysis for Intelligent Healthcare Assistance
 # ============================================================
 #
-# This module defines the system prompt used by the
-# MediGuide Retrieval-Augmented Generation (RAG) pipeline.
-#
-# The prompt guides the language model to:
-# 1. Answer questions using retrieved medical context
-# 2. Avoid unsupported or fabricated information
-# 3. Keep responses short and clear
-# 4. Admit when the answer is not available in the context
+# This file contains:
+# 1. Follow-up question reformulation prompt
+# 2. Medical question-answering prompt
+# 3. Conversation history placeholders
 #
 # Authors:
 # Saurabh Kumbhar - 25204974
@@ -18,29 +14,93 @@
 # ============================================================
 
 
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    MessagesPlaceholder,
+)
+
+
 # ============================================================
-# MediGuide Question-Answering System Prompt
+# 1. Follow-Up Question Reformulation Prompt
+# ============================================================
+
+# This prompt allows MediGuide to understand questions such as:
+#
+# User:
+# "What is acne?"
+#
+# User:
+# "How can it be treated?"
+#
+# The model internally reformulates the second question into:
+#
+# "How can acne be treated?"
+#
+# This improved standalone query is then sent to Pinecone.
+
+contextualize_q_system_prompt = (
+    "Given the conversation history and the latest user question, "
+    "rewrite the latest question as a standalone question that can "
+    "be understood without the previous conversation. "
+    "Do not answer the question. "
+    "Only reformulate the question when necessary."
+)
+
+
+contextualize_q_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            contextualize_q_system_prompt,
+        ),
+
+        # Insert previous conversation messages here.
+        MessagesPlaceholder("chat_history"),
+
+        (
+            "human",
+            "{input}",
+        ),
+    ]
+)
+
+
+# ============================================================
+# 2. MediGuide Medical Question-Answering Prompt
 # ============================================================
 
 system_prompt = (
-    # Define the role of the language model.
-    "You are MediGuide, a medical assistant designed for "
-    "question-answering tasks. "
-
-    # Instruct the model to rely on retrieved RAG context.
-    "Use the following pieces of retrieved medical context "
-    "to answer the user's question. "
-
-    # Prevent the model from inventing unsupported answers.
-    "If the answer cannot be determined from the provided context, "
+    "You are MediGuide, a medical information assistant. "
+    "Answer the user's question using the retrieved medical context. "
+    "Use conversation history when necessary to understand follow-up "
+    "questions and references to previously discussed conditions. "
+    "If the answer cannot be determined from the retrieved context, "
     "say that you do not know. "
-
-    # Keep chatbot responses simple and concise.
-    "Use a maximum of three sentences and keep the answer "
-    "clear and concise."
-
-    # Retrieved documents from the vector database
-    # are inserted here dynamically by LangChain.
+    "Keep the response clear, concise, and medically grounded. "
+    "Do not invent information that is not supported by the context."
     "\n\n"
+    "Retrieved medical context:\n"
     "{context}"
+)
+
+
+# ============================================================
+# 3. Question-Answering Prompt With Memory
+# ============================================================
+
+qa_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            system_prompt,
+        ),
+
+        # Previous user and assistant messages.
+        MessagesPlaceholder("chat_history"),
+
+        (
+            "human",
+            "{input}",
+        ),
+    ]
 )

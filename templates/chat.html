@@ -2126,56 +2126,87 @@
 
 
 
-        // ----------------------------------------------------------
+        // ==========================================================
         // Clear Conversation
-        // ----------------------------------------------------------
+        // ==========================================================
 
         clearButton.addEventListener(
-
             "click",
+            async function () {
 
-            function () {
+                try {
+
+                    // ----------------------------------------------
+                    // Clear Backend Conversation Memory
+                    // ----------------------------------------------
+
+                    await fetch(
+                        "/clear",
+                        {
+                            method: "POST"
+                        }
+                    );
 
 
-                messages.innerHTML = `
+                    // ----------------------------------------------
+                    // Clear Visible Chat Messages
+                    // ----------------------------------------------
 
-                    <div class="bot-message-row">
+                    messages.innerHTML = `
 
-                        <div class="message-avatar">
+                        <div class="bot-message-row">
 
-                            <i class="fa-solid fa-heart-pulse"></i>
+                            <div class="message-avatar">
+
+                                <i class="fa-solid fa-heart-pulse"></i>
+
+                            </div>
+
+
+                            <div class="bot-message">
+
+                                <span class="message-author">
+                                    MediGuide
+                                </span>
+
+
+                                <p>
+                                    Conversation cleared.
+                                    What would you like to know?
+                                </p>
+
+                            </div>
 
                         </div>
 
-
-                        <div class="bot-message">
-
-                            <span class="message-author">
-                                MediGuide
-                            </span>
+                    `;
 
 
-                            <p>
-
-                                Conversation cleared.
-                                What would you like to know?
-
-                            </p>
-
-                        </div>
-
-                    </div>
-                `;
+                    // Show suggested questions again.
+                    suggestions.style.display =
+                        "flex";
 
 
-                suggestions.style.display =
-                    "flex";
+                    // Focus the input field.
+                    chatInput.focus();
 
 
-                chatInput.focus();
+                    console.log(
+                        "MediGuide conversation memory cleared."
+                    );
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Unable to clear conversation:",
+                        error
+                    );
+
+                }
 
             }
-
         );
 
 
