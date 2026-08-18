@@ -13,6 +13,12 @@
   <img src="docs/images/mediguide-home.png" alt="MediGuide interface" width="100%">
 </p>
 
+<p align="center">
+  <a href="https://youtu.be/7Pj-mZbR9ro">
+    ▶ Watch the MediGuide Demo Video
+  </a>
+</p>
+
 ---
 
 ## Project Team
