@@ -894,3 +894,12 @@ The implementation was inspired by existing medical RAG examples and extended wi
 **AI-Powered Analysis for Intelligent Healthcare Assistance**
 
 `Python` • `Flask` • `LangChain` • `GPT-4o` • `Pinecone` • `Sentence Transformers` • `Docker` • `Amazon EC2` • `Amazon ECR` • `GitHub Actions`
+
+## Project Team
+
+| Student | Student ID |
+|---|---:|
+| **Saurabh Rajkumar Kumbhar** | 25204974 |
+| **Azim Hassan** | 25203062 |
+
+---
